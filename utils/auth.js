@@ -9,6 +9,8 @@ async function authorize(req, res, next) {
     if (!admin) {
         res.send(401).json({ message: "Unauthorized access" });
     }
+
+    // TODO(raneet10): Verify admin from a set of addresses
     next();
 }
 
