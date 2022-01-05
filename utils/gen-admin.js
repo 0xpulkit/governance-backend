@@ -1,27 +1,17 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
 const Admin = require('../models/admin');
 
- async function genAdmin(username, password) {
+ async function genAdmin(address) {
      const admin = await Admin.create({
-         username: username,
-         password: password
+         address: address
      });
 
      return admin;
  }
 
- let password;
- const username = process.env.USERNAME;
- const textPassword = process.env.PASSWORD;
- const saltRounds = 10;
+ const address = process.env.ADDRESS;
 
- bcrypt.hash(textPassword, saltRounds)
- .then(function(hash) {
-     password = hash;
- }); 
-
- genAdmin(username, password)
+ genAdmin(address)
  .then(res => {
      console.log(res);
     })
