@@ -10,6 +10,6 @@ router.get("/", async function(req, res) {
 // TODO(raneet10): We can do some custom validations here.
 router.post("/create", authorize, addController);
 router.put("/update", authorize, updateController);
-router.get("/fetch", authorize, fetchController);
+router.get("/fetch", fetchController);
 
 module.exports = router;
