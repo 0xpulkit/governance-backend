@@ -2,11 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require('morgan');
+const helmet = require('helmet');
 const routes = require("./routes/routes.js");
 
 const app = express();
+app.use(helmet());
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(morgan("tiny"));
 app.use("/", routes);
 
@@ -20,11 +22,11 @@ const execute = async () => {
         console.log("DB connected!");
         app.listen(process.env.PORT || 8080, () => {
             console.log(`Server starting on port: ${process.env.PORT || 8080}`)
-          })
+        })
     } catch (error) {
         console.log("Error : ", error);
     }
-    
+
 }
 
 execute();

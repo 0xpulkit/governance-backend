@@ -1,12 +1,36 @@
-const {validationResult} = require('express-validator');
+require("dotenv").config();
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 const Proposal = require('../models/proposal');
+const verifySig = require('../utils/auth');
 
-// TODO(raneet10): Add some more controllers(and also find better names)    
+const loginController = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        if (!verifySig(req.body.address, req.body.sig)) {
+            res.sendStatus(401);
+        }
+
+        var token = jwt.sign({ id: req.body.address }, process.env.JWT_SECRET, { expiresIn: "24h" });
+        res.status(200).json({
+            owner: req.body.address,
+            auth_token: token
+        })
+    } catch (error) {
+        console.log("error: ", error);
+        res.sendStatus(401);
+    }
+}
+
 const addController = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ errors: errors.array() });
         }
         await Proposal.create({
             proposalId: req.body.proposalId,
@@ -27,7 +51,7 @@ const updateController = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ errors: errors.array() });
         }
 
         await Proposal.updateOne({
@@ -49,15 +73,16 @@ const fetchController = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ errors: errors.array() });
         }
 
         let proposal = await Proposal.findOne({
-            proposalId: req.query.proposalId}, 
-            {_id: 0, __v: 0}).lean();
-         
+            proposalId: req.query.proposalId
+        },
+            { _id: 0, __v: 0 }).lean();
+
         if (!proposal) {
-            proposal={};
+            proposal = {};
         }
         res.send(proposal).json();
     } catch (error) {
@@ -66,4 +91,4 @@ const fetchController = async (req, res) => {
     }
 }
 
-module.exports = { addController, updateController, fetchController }
+module.exports = { loginController, addController, updateController, fetchController }

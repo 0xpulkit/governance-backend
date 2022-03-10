@@ -1,17 +1,28 @@
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const Admin = require('../models/admin');
 
 async function authorize(req, res, next) {
     try {
-        const admin = await Admin.findOne({
-            address: req.body.address}, 
-            {_id: 0, __v: 0}).lean();
-        
-        if (!admin) {
+        var token = req.headers["authorization"];
+        if (!token) {
             res.sendStatus(401);
-        } else {
-            next();
         }
+        jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+            if (err) {
+                res.sendStatus(401);
+            }
+            const admin = await Admin.findOne({
+                address: decoded
+            },
+                { _id: 0, __v: 0 }).lean();
+
+            if (!admin) {
+                res.sendStatus(401);
+            }
+
+            next();
+        })
 
     } catch (error) {
         console.log("error: ", error);

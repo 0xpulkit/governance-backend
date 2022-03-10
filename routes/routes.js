@@ -1,13 +1,20 @@
 const express = require("express");
 const { body, query } = require("express-validator");
 const authorize = require("../middlewares/auth");
-const { addController, updateController, fetchController } = require("../controllers/controller");
+const { loginController, addController, updateController, fetchController } = require("../controllers/controller");
 const router = express.Router();
 
-router.get("/", async function(req, res) {
+router.get("/", async function (req, res) {
     res.send("Governance Backend");
 });
 
+router.post(
+    "/login",
+    [
+        body("address", "Invalid address").exists().isEthereumAddress(),
+        body("signature", "Invalid signature").exists()
+    ],
+    loginController);
 /**
  * Creates a new proposal
  * @param proposalId
@@ -18,16 +25,16 @@ router.get("/", async function(req, res) {
  * @param address
  */
 router.post(
-    "/create", 
-[
-    body("proposalId", "Invalid proposal Id").exists(),
-    body("title", "Invalid title").exists(),
-    body("description", "Invalid description").exists(),
-    body("created", "Invalid creator address").exists().isEthereumAddress(),
-    body("edited", "Invalid editor address").exists().isEthereumAddress(),
-    body("address", "Invalid admin address").exists().isEthereumAddress()
-],
-authorize, addController);
+    "/create",
+    [
+        body("proposalId", "Invalid proposal Id").exists(),
+        body("title", "Invalid title").exists(),
+        body("description", "Invalid description").exists(),
+        body("created", "Invalid creator address").exists().isEthereumAddress(),
+        body("edited", "Invalid editor address").exists().isEthereumAddress(),
+        body("address", "Invalid admin address").exists().isEthereumAddress()
+    ],
+    authorize, addController);
 
 /**
  * @param proposalId
@@ -44,7 +51,7 @@ router.put(
         body("description", "Invalid description").exists(),
         body("edited", "Invalid editor address").exists().isEthereumAddress(),
         body("address", "Invalid admin address").exists().isEthereumAddress()
-    ], 
+    ],
     authorize, updateController);
 
 /**
@@ -52,7 +59,7 @@ router.put(
  */
 router.get(
     "/fetch",
-    query("proposalId", "Invalid proposal Id").exists(), 
+    query("proposalId", "Invalid proposal Id").exists(),
     fetchController);
 
 module.exports = router;
