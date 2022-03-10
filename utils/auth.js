@@ -1,6 +1,5 @@
 const ethUtil = require('ethereumjs-util');
 const sigUtil = require('@metamask/eth-sig-util');
-const consts = require('consts');
 
 function signData(owner) {
     return {
