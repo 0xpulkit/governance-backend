@@ -4,16 +4,18 @@ const Admin = require('../models/admin');
 
 async function authorize(req, res, next) {
     try {
-        var token = req.headers["authorization"];
-        if (!token) {
-            res.sendStatus(401);
+        var auth = req.headers["authorization"];
+        console.log(auth);
+        if (!auth) {
+            return res.sendStatus(401);
         }
-        jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+        var token = auth.split(" ")
+        jwt.verify(token[1], process.env.JWT_SECRET, async (err, decoded) => {
             if (err) {
-                res.sendStatus(401);
+                return res.sendStatus(401);
             }
             const admin = await Admin.findOne({
-                address: decoded
+                address: decoded.id
             },
                 { _id: 0, __v: 0 }).lean();
 
@@ -26,7 +28,7 @@ async function authorize(req, res, next) {
 
     } catch (error) {
         console.log("error: ", error);
-        res.sendStatus(401);
+        return res.sendStatus(401);
     }
 
 }

@@ -11,12 +11,12 @@ const loginController = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        if (!verifySig(req.body.address, req.body.sig)) {
+        if (!verifySig(req.body.address, req.body.signature)) {
             res.sendStatus(401);
         }
 
         var token = jwt.sign({ id: req.body.address }, process.env.JWT_SECRET, { expiresIn: "24h" });
-        res.status(200).json({
+        return res.status(200).json({
             owner: req.body.address,
             auth_token: token
         })

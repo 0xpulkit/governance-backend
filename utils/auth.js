@@ -6,7 +6,6 @@ function signData(owner) {
         types: {
             EIP712Domain: [
                 { name: "name", type: "string" },
-                { name: "host", type: "string" },
                 { name: "version", type: "string" },
                 { name: "chainId", type: "uint256" },
                 { name: "verifyingContract", type: "address" },
@@ -15,9 +14,8 @@ function signData(owner) {
         },
         domain: {
             name: "Polygon Governance",
-            host: "",
             version: "1",
-            verifyingContract: "0x0",
+            verifyingContract: "0x0000000000000000000000000000000000000000",
             chainId: "137",
         },
         primaryType: "Owner",
@@ -29,10 +27,11 @@ function verifySig(owner, sig) {
     const signedData = signData(owner);
     const recovered = sigUtil.recoverTypedSignature({
         data: signedData,
-        signature: sig
-    });
+        signature: sig,
+        version: "V3"
+    })
 
-    return recovered && ethUtil.toChecksumAddress(recovered) === ethUtil.toChecksumAddress(consts.owner);
+    return recovered && ethUtil.toChecksumAddress(recovered) === ethUtil.toChecksumAddress(owner);
 }
 
 module.exports = verifySig;
