@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, query } = require("express-validator");
 const authorize = require("../middlewares/auth");
-const { loginController, addController, updateController, fetchController } = require("../controllers/controller");
+const { loginController, addController, updateController, fetchController, newAdminController } = require("../controllers/controller");
 const router = express.Router();
 
 router.get("/", async function (req, res) {
@@ -15,6 +15,14 @@ router.post(
         body("signature", "Invalid signature").exists()
     ],
     loginController);
+
+router.post(
+    "/admin/add",
+    [
+        body("address", "Invalid address").exists().isEthereumAddress()
+    ],
+    authorize, newAdminController
+)
 /**
  * Creates a new proposal
  * @param proposalId

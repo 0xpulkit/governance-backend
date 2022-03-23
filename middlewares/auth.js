@@ -5,7 +5,6 @@ const Admin = require('../models/admin');
 async function authorize(req, res, next) {
     try {
         var auth = req.headers["authorization"];
-        console.log(auth);
         if (!auth) {
             return res.sendStatus(401);
         }

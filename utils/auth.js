@@ -1,5 +1,7 @@
 const ethUtil = require('ethereumjs-util');
 const sigUtil = require('@metamask/eth-sig-util');
+const Admin = require('../models/admin');
+
 
 function signData(owner) {
     return {
@@ -23,7 +25,7 @@ function signData(owner) {
     };
 }
 
-function verifySig(owner, sig) {
+async function verifySig(owner, sig) {
     const signedData = signData(owner);
     const recovered = sigUtil.recoverTypedSignature({
         data: signedData,
@@ -31,7 +33,19 @@ function verifySig(owner, sig) {
         version: "V3"
     })
 
-    return recovered && ethUtil.toChecksumAddress(recovered) === ethUtil.toChecksumAddress(owner);
+    if (!recovered) {
+        return false
+    }
+    const admin = await Admin.findOne({
+        address: ethUtil.toChecksumAddress(recovered)
+    },
+        { _id: 0, __v: 0 }).lean();
+
+    // TODO(raneet10): It could be a possibility that a new owner was added to multisig    
+    if (!admin) {
+        return false
+    }
+    return true;
 }
 
 module.exports = verifySig;
