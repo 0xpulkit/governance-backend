@@ -8,6 +8,11 @@ router.get("/", async function (req, res) {
     res.send("Governance Backend");
 });
 
+/**
+ * Admin login
+ * @param address
+ * @param signature
+ */
 router.post(
     "/login",
     [
@@ -16,6 +21,10 @@ router.post(
     ],
     loginController);
 
+/**
+ * Add another admin
+ * @param address
+ */
 router.post(
     "/admin/add",
     [
